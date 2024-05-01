@@ -1,0 +1,137 @@
+---
+title: "NFL Insights (2001-2023)"
+author: "Joseph Tovar"
+date: "2024-04-26"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Introduction
+
+Hey! My Name is Joseph Tovar. I am currently Enrolled at Texas State University and majoring in a BBA in Computer Information Systems. My set Grade date is in August 2024. Here lies my insights of NFL player/season rushing stats from seasons 2001 to 2023. Downloaded Dataset from: <https://www.kaggle.com/datasets/rishabjadhav/nfl-rushing-statistics-2001-2023/code>.
+
+
+```{r}
+#To get started 
+#library(tidyverse)
+dat <- read.csv("rushing_cleaned.csv", na.strings = c("", "NA", "NULL"))
+```
+
+
+## Total Number Of Touchdowns for Players 
+
+This insight is based off of the top 1% of players that have scored the most TD's in a single season. If there name has popped up twice then it would be added into the visualization. 
+
+```{r}
+#Insight 1: Top 1% of players that have had breakout season(s) based on TD's from 2000-2023 
+
+#get the total amount of rushing Touchdowns for top 10% players(rTd) by finding the better than average players first
+df_avg <- dat %>% filter(rTD > mean(rTD))
+
+#ordered by Rushing TD by descending, while the players scored more than average
+sorted_df <- df_avg[order(-df_avg$rTD), ]
+top_10 <- head(sorted_df, n = 18)
+
+#summary of Touchdowns
+summary(top_10$rTD)
+
+#visualizes the top 1% of players with the most rushing touchdowns per season in the past 23 seasons 
+ggplot(data = top_10, aes(x = rTD, y = Player, fill = Player)) +
+  geom_bar(stat = "identity") + labs(x = 'Touchdowns', title = 'Total Number of Touchdowns')
+
+```
+
+## Total Yardage For Players 
+
+This insight is the pretty much the same as the last insight but instead of Touchdowns, I implented yards instead.
+
+```{r}
+#Insight 2:  Top 1% of players that have had breakout season(s) based on rushing yards from 2000-2023 
+
+#get the total amount of rushing yards for top 10% players(rTd) by finding the better than average players first
+yd_avg <- dat %>% filter(rYds > mean(rYds))
+
+#ordered by Rushing yards by decending, while the players scored more than average
+sorted_yd <- yd_avg[order(-df_avg$rYds), ]
+top_10_yd <- head(sorted_df, n = 18)
+
+#Stats of rushing Yards
+summary(top_10_yd$rYds)
+
+#visualizes the top 1% of players with the most rushing yards per season in the past 23 seasons
+#...adds the total if player has occured more than once in the top ten
+ggplot(data = top_10_yd, aes(x = rYds, y = Player, fill = Player)) +
+  geom_bar(stat = "identity") + labs(x = 'Yards', title = 'Total Yardage Per Player')
+
+
+```
+
+
+
+## Total Fumbles Per Year 
+
+I thought this one was a funny stat and just wanted to see how many fumbles there are for each season and how each season compares to each other. Turns out there is tons of fumbles per year!
+
+```{r}
+#Insight 3: year and fumbles
+fum_year <- select(dat,Fmb,Year)
+
+#summary of fumbles 
+summary(fum_year$Fmb)
+
+ggplot(data = fum_year, aes(x = Year, y = Fmb, fill = Year)) +
+  geom_bar(stat = 'identity') + labs(y = 'Fumbles', title = 'Total Fumbles Per Year') 
+
+```
+
+
+## Comparing Rushing Attempts to Rushing Yards
+
+Wanted to see how the relationship was between these two. Of course it makes sense for it to be a postive relationship for the players that have alot of rushing attempts to have tons of yards to go with it. We can come to many conclusions with this visualization, to name a few: we can tell that the players who are in the middle of the pack and up are running backs and bottom are QB's. We see the outliers which are way above the regression line and even below. 
+
+```{r}
+#Insight 4: looking at rushing attempts and Yards data with line of best fit
+avg_rush <- dat %>% filter(rAtt >mean(rAtt))
+ggplot(avg_rush, aes(x = rAtt, y = rYds)) + geom_point() +
+geom_smooth(method = "lm", se = FALSE) + labs(x = 'Rushing Attempts', y = 'Rushing Yards', title = 'Relationship Between Rushing Attempts & Rushing Yards' )
+
+
+```
+
+
+## Total Yards in a Season
+This insight counts all the average yards per game in a season and we can compare to the rest of the seasons in average rushing yards.
+
+```{r}
+#Insight 5: average yrds in each year that is greater than 100
+
+avg_yrd_year <- dat %>% filter(rY.g >mean(rY.g))
+
+
+#summary of total yards per player 
+summary(avg_yrd_year$rYds)
+
+
+ggplot(avg_yrd_year, aes(x = Year, y = rYds, fill = Year)) + geom_bar(stat = 'identity') + 
+  scale_fill_gradient(low = 'red', high = 'orange')+
+  labs(title = 'Total Yards Per Year ',y = 'Total Yards') 
+  
+```
+
+
+
+Note that most of my insights I am basically cutting the data set in half so could get closer to actually running backs and QB's that actually run the ball as well. It also cuts out players that just subbed in for a game or two or didn't complete majority of the season running the ball.
+
+
+## Conclusion 
+
+Thanks for Reading! This was a HUGE learning point for me and this is something I am going to carryout in my future. My first Project using Data. Time management was very tough taking 18 hours this semester but I hope you enjoyed looking at my insights. Definitely going to be doing some more projects. Although they may be a headache I really enjoy what data is about and what can we find if we really dig deep. 
+
+
